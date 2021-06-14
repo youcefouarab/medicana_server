@@ -110,6 +110,6 @@ app.get('/availabilities/:doctor_id/:date', function(req, res, next) {
     });
 });
 
-var server = app.listen(8082, function() {
+var server = app.listen(function() {
     console.log("server listening on port " + server.address().port);
 });
