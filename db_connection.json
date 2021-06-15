@@ -1,6 +1,6 @@
 {
-	"host"		: "localhost",
-	"user"		: "root",
-	"password"	: "",
-	"database"	: "medicana"
+	"host"		: "sql11.freemysqlhosting.net",
+	"user"		: "sql11419174",
+	"password"	: "k8fpYin4al",
+	"database"	: "sql11419174"
 }
