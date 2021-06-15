@@ -100,7 +100,7 @@ app.get('/auth_doctor/:phone_number', function(req, res, next) {
 });
 
 app.get('/availabilities/:doctor_id/:date', function(req, res, next) {  
-    var query = "select * from availability where doctor_id = ? and date = ?";
+    var query = "select * from appointment where doctor_id = ? and date = ? and patient_id = NULL";
     connection.query(query, [req.params.doctor_id, req.params.date], function(error, results) {
         if (error) { 
             next(error);
