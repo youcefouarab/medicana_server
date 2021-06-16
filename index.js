@@ -69,14 +69,14 @@ app.get('/doctor/:doctor_id', function(req, res, next) {
   	});
 });
 
-app.get('/auth_patient/:phone_number', function(req, res, next) {
+app.get('/auth_patient/:phone_number/:password', function(req, res, next) {
 	var data = Object();
     var query = "select * from patient natural join user where phone_number = ?";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
     	} else {
-        	if (results.length > 0) {
+        	if ((results.length > 0) && (results[0].password == req.params.password)){
           		data = results[0];
         	}
     		res.send(JSON.stringify(data));
@@ -84,14 +84,14 @@ app.get('/auth_patient/:phone_number', function(req, res, next) {
   	});
 });
 
-app.get('/auth_doctor/:phone_number', function(req, res, next) {
+app.get('/auth_doctor/:phone_number/:password', function(req, res, next) {
 	var data = Object();
     var query = "select * from doctor natural join user where phone_number = ?";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
     	} else {
-        	if (results.length > 0) {
+        	if ((results.length > 0) && (results[0].password == req.params.password)){
           		data = results[0];
         	}
     		res.send(JSON.stringify(data));
