@@ -110,6 +110,30 @@ app.get('/availabilities/:doctor_id/:date/:time', function(req, res, next) {
     });
 });
 
+app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next) {
+    var query = "update appointment set patient_id = ? where appointment_id = ?";
+    var ret = "error";
+    connection.query(query, [req.params.patient_id, req.params.appointment_id], function(error, results) {
+    	if (error) {
+    	    next(error);
+    	} else {
+    	    ret = "success";	
+    	}
+	res.send(JSON.stringify(ret));
+    });
+}); 
+
+app.get('/patient_appointments/:patient_id', function(req, res, next) {
+    var query = "select * from appointment where patient_id = ?";
+    connection.query(query, [req.params.patient_id], function(error, results) {
+    	if (error) {
+    		next(error);
+    	} else {
+    		res.send(JSON.stringify(results));
+    	}
+  	});
+});
+
 
 const PORT = process.env.PORT || 8082;
 var server = app.listen(PORT, function() {
