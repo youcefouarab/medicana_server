@@ -130,7 +130,7 @@ app.delete('/cancel_appointment/:appointment_id', function(req, res, next) {
         if (error) {
             next(error);
         } else {
-            ret = "success":
+            ret = "success";
         }
         res.send(JSON.stringify(ret));
     });
