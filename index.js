@@ -123,8 +123,8 @@ app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next
     });
 }); 
 
-app.delete('/cancel_appointment/:appointment_id', function(req, res, next) {
-    var query = "delete from appointment where appointment_id = ?";
+app.put('/cancel_appointment/:appointment_id', function(req, res, next) {
+    var query = "update appointment set patient_id = null where appointment_id = ?";
     var ret = "error";
     connection.query(query, [req.params.appointment_id], function(error, results) {
         if (error) {
