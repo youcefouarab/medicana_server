@@ -119,9 +119,22 @@ app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next
     	} else {
     	    ret = "success";	
     	}
-	res.send(JSON.stringify(ret));
+	   res.send(JSON.stringify(ret));
     });
 }); 
+
+app.delete('/cancel_appointment/:appointment_id', function(req, res, next) {
+    var query = "delete from appointment where appointment_id = ?";
+    var ret = "error";
+    connection.query(query, [req.params.appointment_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = "success":
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
 
 app.get('/patient_appointments/:patient_id', function(req, res, next) {
     var query = "select * from appointment where patient_id = ?";
