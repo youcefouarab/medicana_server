@@ -20,17 +20,6 @@ app.get('/', function(req, res, next) {
     res.send(JSON.stringify("server is up and running!"));
 });
 
-app.get('/patients', function(req, res, next) {  
-    var query = "select * from patient natural join user";
-    connection.query(query, function(error, results) {
-        if (error) { 
-            next(error);
-        } else {
-            res.send(JSON.stringify(results));
-        }
-    });
-});
-
 app.get('/doctors', function(req, res, next) {  
     var query = "select * from doctor natural join user";
     connection.query(query, function(error, results) {
@@ -103,8 +92,10 @@ app.get('/auth_doctor/:phone_number/:password', function(req, res, next) {
 });
 
 app.get('/availabilities/:doctor_id/:date/:time', function(req, res, next) {
-    var query = "select * from appointment where doctor_id = ? and date = ? and time > ? and patient_id is null";
-    connection.query(query, [req.params.doctor_id, req.params.date_time], function(error, results) {
+    var query = "select * from appointment " 
+                + "where doctor_id = ? and date = ? and time > ? and patient_id is null "
+                + "order by date, time";
+    connection.query(query, [req.params.doctor_id, req.params.date, req.params.time], function(error, results) {
         if (error) { 
             next(error);
         } else {
