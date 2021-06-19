@@ -31,6 +31,28 @@ app.get('/doctors', function(req, res, next) {
     });
 });
 
+app.get('/patient_doctors', function(req, res, next) {
+    var query = "select * from doctor where doctor_id in (";
+    var data = [];
+    if (req.body.length > 0) {
+        req.body.forEach(e => {
+            query += "?,";
+            data.push(e);
+        });
+        query = query.slice(0, query.length - 1);
+        query += ")";
+    }
+    var ret = ERROR;
+    connection.query(query, data, function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
+
 app.get('/patient/:patient_id', function(req, res, next) {
 	var data = Object();
     var query = "select * from patient natural join user where patient_id = ?";
