@@ -40,8 +40,8 @@ app.get('/patient_doctors', function(req, res, next) {
             data.push(e);
         });
         query = query.slice(0, query.length - 1);
-        query += ")";
     }
+    query += ")";
     var ret = ERROR;
     connection.query(query, data, function(error, results) {
         if (error) {
