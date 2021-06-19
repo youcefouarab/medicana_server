@@ -34,8 +34,8 @@ app.get('/doctors', function(req, res, next) {
 app.get('/patient_doctors', function(req, res, next) {
     var query = "select * from doctor where doctor_id in (";
     var data = [];
-    if (req.body.length > 0) {
-        req.body.forEach(e => {
+    if (req.query.doctors_id.length > 0) {
+        req.query.doctors_id.forEach(e => {
             query += "?,";
             data.push(e);
         });
