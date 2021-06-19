@@ -13,6 +13,9 @@ app.use(express.static("public"));
 
 var connection = mysql.createPool(db_connection);
 
+const SUCCESS = "success";
+const ERROR = "error";
+
 app.get('/', function(req, res, next) {  
     res.send(JSON.stringify("server is up and running!"));
 });
@@ -99,9 +102,9 @@ app.get('/auth_doctor/:phone_number/:password', function(req, res, next) {
   	});
 });
 
-app.get('/availabilities/:doctor_id/:date/:time', function(req, res, next) {
-    var query = "select * from appointment where doctor_id = ? and date = ? and time > ? and patient_id is null";
-    connection.query(query, [req.params.doctor_id, req.params.date, req.params.time], function(error, results) {
+app.get('/availabilities/:doctor_id/:date_time', function(req, res, next) {
+    var query = "select * from appointment where doctor_id = ? and date_time > ? and patient_id is null";
+    connection.query(query, [req.params.doctor_id, req.params.date_time], function(error, results) {
         if (error) { 
             next(error);
         } else {
@@ -112,12 +115,12 @@ app.get('/availabilities/:doctor_id/:date/:time', function(req, res, next) {
 
 app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next) {
     var query = "update appointment set patient_id = ? where appointment_id = ?";
-    var ret = "error";
+    var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.appointment_id], function(error, results) {
     	if (error) {
     	    next(error);
     	} else {
-    	    ret = "success";	
+    	    ret = SUCCESS;	
     	}
 	   res.send(JSON.stringify(ret));
     });
@@ -125,12 +128,12 @@ app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next
 
 app.put('/cancel_appointment/:appointment_id', function(req, res, next) {
     var query = "update appointment set patient_id = null where appointment_id = ?";
-    var ret = "error";
+    var ret = ERROR;
     connection.query(query, [req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
         } else {
-            ret = "success";
+            ret = SUCCESS;
         }
         res.send(JSON.stringify(ret));
     });
@@ -145,6 +148,27 @@ app.get('/patient_appointments/:patient_id', function(req, res, next) {
     		res.send(JSON.stringify(results));
     	}
   	});
+});
+
+app.post('/ask_advice/:patient_id/:doctor_id/:message/:date_time', function(req, res, next) {
+    var query = "insert into advice (patient_id, doctor_id, message, date_time) values";
+    var data = [];
+    if (req.params.body.length > 0) {
+        req.params.body.forEach(e => {
+            query += " (?, ?, ?, ?),";
+            data.push(e.patient_id, e.doctor_id, e.message, e.date_time);
+        });
+        query = query.slice(0, query.length - 1);
+    }
+    var ret = ERROR;
+    connection.query(query, data, function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
 });
 
 
