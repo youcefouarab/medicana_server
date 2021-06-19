@@ -32,7 +32,7 @@ app.get('/doctors', function(req, res, next) {
 });
 
 app.get('/patient_doctors/:patient_id', function(req, res, next) {
-    var query = "select * from doctor where doctor_id in (select distinct doctor_id from appointment where patient_id = ?)";
+    var query = "select * from doctor natural join user where doctor_id in (select distinct doctor_id from appointment where patient_id = ?)";
     connection.query(query, req.params.patient_id, function(error, results) {
         if (error) {
             next(error);
