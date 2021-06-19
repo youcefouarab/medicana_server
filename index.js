@@ -42,14 +42,13 @@ app.get('/patient_doctors', function(req, res, next) {
         query = query.slice(0, query.length - 1);
     }
     query += ")";
-    var ret = ERROR;
     connection.query(query, data, function(error, results) {
         if (error) {
             next(error);
         } else {
-            ret = SUCCESS;
+            res.send(JSON.stringify(results));
         }
-        res.send(JSON.stringify(ret));
+        
     });
 });
 
@@ -181,6 +180,19 @@ app.post('/ask_advice', function(req, res, next) {
             ret = SUCCESS;
         }
         res.send(JSON.stringify(ret));
+    });
+});
+
+
+app.get('/all_advice/:patient_id', function(req, res, next) {
+    var query = "select * from advice where patient_id = ?";
+    connection.query(query, [req.params.patient_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
     });
 });
 
