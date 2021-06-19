@@ -141,11 +141,11 @@ app.get('/patient_appointments/:patient_id', function(req, res, next) {
   	});
 });
 
-app.post('/ask_advice/:patient_id/:doctor_id/:message/:date_time', function(req, res, next) {
+app.post('/ask_advice', function(req, res, next) {
     var query = "insert into advice (patient_id, doctor_id, message, date_time) values";
     var data = [];
-    if (req.params.body.length > 0) {
-        req.params.body.forEach(e => {
+    if (req.body.length > 0) {
+        req.body.forEach(e => {
             query += " (?, ?, ?, ?),";
             data.push(e.patient_id, e.doctor_id, e.message, e.date_time);
         });
