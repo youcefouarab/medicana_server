@@ -31,18 +31,9 @@ app.get('/doctors', function(req, res, next) {
     });
 });
 
-app.get('/patient_doctors', function(req, res, next) {
-    var query = "select * from doctor where doctor_id in (";
-    var data = [];
-    if (req.query.doctors_id.length > 0) {
-        req.query.doctors_id.forEach(e => {
-            query += "?,";
-            data.push(e);
-        });
-        query = query.slice(0, query.length - 1);
-    }
-    query += ")";
-    connection.query(query, data, function(error, results) {
+app.get('/patient_doctors/:patient_id', function(req, res, next) {
+    var query = "select * from doctor where doctor_id in (select distinct doctor_id from appointment where patient_id = ?)";
+    connection.query(query, req.params.patient_id, function(error, results) {
         if (error) {
             next(error);
         } else {
