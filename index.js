@@ -174,19 +174,10 @@ app.post('/ask_advice', function(req, res, next) {
     });
 });
 
-app.put('/see_advice', function(req, res, next) {
-    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id in (";
-    var data = [req.params.patient_id];
-    if (req.params.doctors_id > 0) {
-        req.params.doctors_id.forEach(e => {
-            query += "?,";
-            data.push(e);
-        });
-        query = query.slice(0, query.length - 1);
-    }
-    query += ")";
+app.put('/see_advice/:patient_id/:doctor_id', function(req, res, next) {
+    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ?";
     var ret = ERROR;
-    connection.query(query, data, function(error, results) {
+    connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
         if (error) {
             next(error);
         } else {
