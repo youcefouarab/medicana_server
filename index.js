@@ -175,7 +175,7 @@ app.post('/ask_advice', function(req, res, next) {
 });
 
 app.put('/see_advice/:patient_id/:doctor_id', function(req, res, next) {
-    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ?";
+    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ? and reply is not null";
     var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
         if (error) {
