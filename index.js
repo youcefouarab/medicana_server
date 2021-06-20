@@ -174,7 +174,7 @@ app.post('/ask_advice', function(req, res, next) {
     });
 });
 
-app.put('/see_advice/:patient_id', function(req, res, next) {
+app.get('/see_advice', function(req, res, next) {
     var query = "update advice set state = 'seen' where patient_id = ? and doctor_id in (";
     var data = [req.body.patient_id];
     if (req.body.doctors_id > 0) {
