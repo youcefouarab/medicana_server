@@ -167,7 +167,7 @@ app.get('/patient_appointments/:patient_id', function(req, res, next) {
 
 app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
     var query = "select * from appointment where doctor_id = ?";
-    connection.query(query, [req.params.patient_id], function(error, results) {
+    connection.query(query, [req.params.doctor_id], function(error, results) {
         if (error) {
             next(error);
         } else {
