@@ -43,6 +43,18 @@ app.get('/patient_doctors/:patient_id', function(req, res, next) {
     });
 });
 
+app.get('/doctor_patients/:doctor_id', function(req, res, next) {
+    var query = "select * from patient natural join user where patient_id in (select distinct patient_id from advice where doctor_id = ?)";
+    connection.query(query, req.params.doctor_id, function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+        
+    });
+});
+
 app.get('/patient/:patient_id', function(req, res, next) {
 	var data = Object();
     var query = "select * from patient natural join user where patient_id = ?";
@@ -153,6 +165,17 @@ app.get('/patient_appointments/:patient_id', function(req, res, next) {
   	});
 });
 
+app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
+    var query = "select * from appointment where doctor_id = ?";
+    connection.query(query, [req.params.patient_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    });
+});
+
 app.post('/ask_advice', function(req, res, next) {
     var query = "insert into advice (patient_id, doctor_id, message, date_time) values";
     var data = [];
@@ -160,6 +183,27 @@ app.post('/ask_advice', function(req, res, next) {
         req.body.forEach(e => {
             query += " (?, ?, ?, ?),";
             data.push(e.patient_id, e.doctor_id, e.message, e.date_time);
+        });
+        query = query.slice(0, query.length - 1);
+    }
+    var ret = ERROR;
+    connection.query(query, data, function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
+
+app.post('/give_advice', function(req, res, next) {
+    var query = "insert into advice (patient_id, doctor_id, reply, date_time) values";
+    var data = [];
+    if (req.body.length > 0) {
+        req.body.forEach(e => {
+            query += " (?, ?, ?, ?),";
+            data.push(e.patient_id, e.doctor_id, e.reply, e.date_time);
         });
         query = query.slice(0, query.length - 1);
     }
@@ -187,10 +231,35 @@ app.put('/see_advice/:patient_id/:doctor_id', function(req, res, next) {
     });
 });
 
+app.put('/see_message/:doctor_id/:patient_id', function(req, res, next) {
+    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ? and message is not null";
+    var ret = ERROR;
+    connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
 
-app.get('/all_advice/:patient_id', function(req, res, next) {
+
+app.get('/all_patient_advice/:patient_id', function(req, res, next) {
     var query = "select * from advice where patient_id = ?";
     connection.query(query, [req.params.patient_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
+    });
+});
+
+app.get('/all_doctor_advice/:doctor_id', function(req, res, next) {
+    var query = "select * from advice where doctor_id = ?";
+    connection.query(query, [req.params.doctor_id], function(error, results) {
         if (error) {
             next(error);
         } else {
