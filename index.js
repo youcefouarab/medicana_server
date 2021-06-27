@@ -137,7 +137,7 @@ app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next
     	} else {
     	    ret = SUCCESS;	
     	}
-	    res.json(ret);
+	   res.send(JSON.stringify(ret));
     });
 }); 
 
