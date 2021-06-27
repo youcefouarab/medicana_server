@@ -130,12 +130,12 @@ app.get('/availabilities/:doctor_id/:date/:time', function(req, res, next) {
 
 app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next) {
     var query = "update appointment set patient_id = ? where appointment_id = ?";
-    var ret = "error";
+    var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.appointment_id], function(error, results) {
     	if (error) {
     	    next(error);
     	} else {
-    	    ret = "success";	
+    	    ret = SUCCESS;	
     	}
 	    res.send(JSON.stringify(ret));
     });
