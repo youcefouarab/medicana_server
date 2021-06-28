@@ -177,12 +177,16 @@ app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
 });
 
 app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, next) {
+    var data = Object();
     var query = "select * from appointment natural join patient natural join user where appointment.doctor_id = ? and appointment_id = ?";
     connection.query(query, [req.params.doctor_id, req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
         } else {
-            res.send(JSON.stringify(results));
+            if ((results.length > 0) && (results[0].password == req.params.password)){
+                data = results[0];
+            }
+            res.send(JSON.stringify(data));
         }
     });
 });
