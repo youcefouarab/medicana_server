@@ -177,7 +177,7 @@ app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
 });
 
 app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, next) {
-    var query = "select * from appointment where doctor_id = ? and appointment_id = ?";
+    var query = "select * from appointment natural join patient natural join user where appointment.doctor_id = ? and appointment_id = ?";
     connection.query(query, [req.params.doctor_id, req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
