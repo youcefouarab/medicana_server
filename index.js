@@ -176,6 +176,17 @@ app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
     });
 });
 
+app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, next) {
+    var query = "select * from appointment where doctor_id = ? and appointment_id = ?";
+    connection.query(query, [req.params.doctor_id, req.params.appointment_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    });
+});
+
 app.post('/ask_advice', function(req, res, next) {
     var query = "insert into advice (patient_id, doctor_id, message, date_time) values";
     var data = [];
