@@ -183,7 +183,7 @@ app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, nex
         if (error) {
             next(error);
         } else {
-            if ((results.length > 0) && (results[0].password == req.params.password)){
+            if (results.length > 0){
                 data = results[0];
             }
             res.send(JSON.stringify(data));
