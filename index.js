@@ -15,13 +15,14 @@ var connection = mysql.createPool(db_connection);
 
 const SUCCESS = "success";
 const ERROR = "error";
+const SEEN = "seen";
 
 app.get('/', function(req, res, next) {  
     res.send(JSON.stringify("server is up and running!"));
 });
 
 app.get('/doctors', function(req, res, next) {  
-    var query = "select * from doctor natural join user";
+    var query = "select * from doctor";
     connection.query(query, function(error, results) {
         if (error) { 
             next(error);
@@ -32,7 +33,7 @@ app.get('/doctors', function(req, res, next) {
 });
 
 app.get('/patient_doctors/:patient_id', function(req, res, next) {
-    var query = "select * from doctor natural join user where doctor_id in (select distinct doctor_id from appointment where patient_id = ?)";
+    var query = "select * from doctor where doctor_id in (select distinct doctor_id from appointment where patient_id = ?)";
     connection.query(query, req.params.patient_id, function(error, results) {
         if (error) {
             next(error);
@@ -44,7 +45,7 @@ app.get('/patient_doctors/:patient_id', function(req, res, next) {
 });
 
 app.get('/doctor_patients/:doctor_id', function(req, res, next) {
-    var query = "select * from patient natural join user where patient_id in (select distinct patient_id from advice where doctor_id = ?)";
+    var query = "select * from patient where patient_id in (select distinct patient_id from advice where doctor_id = ?)";
     connection.query(query, req.params.doctor_id, function(error, results) {
         if (error) {
             next(error);
@@ -55,39 +56,9 @@ app.get('/doctor_patients/:doctor_id', function(req, res, next) {
     });
 });
 
-app.get('/patient/:patient_id', function(req, res, next) {
-	var data = Object();
-    var query = "select * from patient natural join user where patient_id = ?";
-    connection.query(query, [req.params.patient_id], function(error, results) {
-    	if (error) {
-    		next(error);
-    	} else {
-        	if (results.length > 0) {
-          		data = results[0];
-        	}
-    		res.send(JSON.stringify(data));
-    	}
-  	});
-});
-
-app.get('/doctor/:doctor_id', function(req, res, next) {
-	var data = Object();
-    var query = "select * from doctor natural join user where doctor_id = ?";
-    connection.query(query, [req.params.doctor_id], function(error, results) {
-    	if (error) {
-    		next(error);
-    	} else {
-        	if (results.length > 0) {
-          		data = results[0];
-        	}
-    		res.send(JSON.stringify(data));
-    	}
-  	});
-});
-
 app.get('/auth_patient/:phone_number/:password', function(req, res, next) {
 	var data = Object();
-    var query = "select * from patient natural join user where phone_number = ?";
+    var query = "select * from patient where phone_number = ?";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
@@ -102,7 +73,7 @@ app.get('/auth_patient/:phone_number/:password', function(req, res, next) {
 
 app.get('/auth_doctor/:phone_number/:password', function(req, res, next) {
 	var data = Object();
-    var query = "select * from doctor natural join user where phone_number = ?";
+    var query = "select * from doctor where phone_number = ?";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
@@ -166,7 +137,7 @@ app.get('/patient_appointments/:patient_id', function(req, res, next) {
 });
 
 app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
-    var query = "select * from appointment where doctor_id = ?";
+    var query = "select * from appointment where doctor_id = ? and patient_id is not null";
     connection.query(query, [req.params.doctor_id], function(error, results) {
         if (error) {
             next(error);
@@ -178,7 +149,7 @@ app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
 
 app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, next) {
     var data = Object();
-    var query = "select * from appointment natural join patient natural join user where appointment.doctor_id = ? and appointment_id = ?";
+    var query = "select * from appointment natural join patient where appointment.doctor_id = ? and appointment_id = ?";
     connection.query(query, [req.params.doctor_id, req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
@@ -234,7 +205,7 @@ app.post('/give_advice', function(req, res, next) {
 });
 
 app.put('/see_advice/:patient_id/:doctor_id', function(req, res, next) {
-    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ? and reply is not null";
+    var query = "update advice set state = '" + SEEN + "' where patient_id = ? and doctor_id = ? and reply is not null";
     var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
         if (error) {
@@ -247,7 +218,7 @@ app.put('/see_advice/:patient_id/:doctor_id', function(req, res, next) {
 });
 
 app.put('/see_message/:doctor_id/:patient_id', function(req, res, next) {
-    var query = "update advice set state = 'seen' where patient_id = ? and doctor_id = ? and message is not null";
+    var query = "update advice set state = '" + SEEN + "' where patient_id = ? and doctor_id = ? and message is not null";
     var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
         if (error) {
@@ -284,8 +255,20 @@ app.get('/all_doctor_advice/:doctor_id', function(req, res, next) {
     });
 });
 
+app.put('/register_token/:user_id/:token', function(req, res, next) {
+    var query = "update user set token = ? where user_id = ?";
+    var ret = ERROR;
+    connection.query(query, [req.params.token, req.params.user_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
 
 const PORT = process.env.PORT || 8082;
 var server = app.listen(PORT, function() {
-    console.log("server listening on port " + server.address().port);
+    console.log("medicana server started");
 });
