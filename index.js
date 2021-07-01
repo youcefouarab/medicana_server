@@ -282,7 +282,7 @@ app.delete('/unregister/:device_id', function(req, res, next) {
 });
 
 app.get('/get_tokens/:user_type/:user_id', function(req, res, next) {
-    var query = "select token from device where user_type = ? and user_id = ?";
+    var query = "select distinct token from device where user_type = ? and user_id = ?";
     connection.query(query, [req.params.user_type, req.params.user_id], function(error, results) {
         if (error) {
             next(error);
