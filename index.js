@@ -313,7 +313,7 @@ app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointmen
                             if (error) {
                                 next(error);
                             } else {
-                                ret = SUCCESS;
+                                ret = treatment_id;
                                 res.send(JSON.stringify(ret));
                             }
                         });
