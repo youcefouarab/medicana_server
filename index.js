@@ -314,15 +314,16 @@ app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointmen
                                 next(error);
                             } else {
                                 ret = SUCCESS;
+                                res.send(JSON.stringify(ret));
                             }
                         });
                     }
                 });
             } else {
                 ret = EXISTS;
+                res.send(JSON.stringify(ret));
             }
         }
-        res.send(JSON.stringify(ret));
     });
 });
 
