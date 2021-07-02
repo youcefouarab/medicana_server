@@ -16,6 +16,7 @@ var connection = mysql.createPool(db_connection);
 const SUCCESS = "success";
 const ERROR = "error";
 const SEEN = "seen";
+const EXISTS = "exists";
 
 app.get('/', function(req, res, next) {  
     res.send(JSON.stringify("server is up and running!"));
@@ -293,19 +294,33 @@ app.get('/get_tokens/:user_type/:user_id', function(req, res, next) {
     });
 });
 
-app.post('/prescribe_treatment/:appointment_id/:start_date/:finish_date/:description', function(req, res, next) {
-    var query = "insert into treatment (appointment_id, start_date, finish_date, description) values (?, ?, ?, ?)";
+app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointment_id', function(req, res, next) {
+    var query = "select treatment_id from appointment where appointment_id = ? limit 1";
     var ret = ERROR;
-    connection.query(query, [
-            req.params.appointment_id, 
-            req.params.start_date, 
-            req.params.finish_date, 
-            req.params.description
-        ], function(error, results) {
+    connection.query(query, [req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
         } else {
-            ret = SUCCESS;
+            if (results[0].treatment_id == null) {
+                query = "insert into treatment (start_date, finish_date, description) values (?, ?, ?)";
+                connection.query(query, [req.params.start_date, req.params.finish_date, req.params.description], function(error, results) {
+                    if (error) {
+                        next(error);
+                    } else {
+                        var treatment_id = results.insertId;
+                        query = "update appointment set treatment_id = ? where appointment_id = ?";
+                        connection.query(query, [treatment_id, req.params.appointment_id], function(error, results) {
+                            if (error) {
+                                next(error);
+                            } else {
+                                ret = treatment_id;
+                            }
+                        });
+                    }
+                });
+            } else {
+                ret = EXISTS;
+            }
         }
         res.send(JSON.stringify(ret));
     });
