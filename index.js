@@ -293,6 +293,24 @@ app.get('/get_tokens/:user_type/:user_id', function(req, res, next) {
     });
 });
 
+app.post('/prescribe_treatment/:patient_id/:start_date/:finish_date/:description', function(req, res, next) {
+    var query = "insert into treatment (patient_id, start_date, finish_date, description) values (?, ?, ?, ?)";
+    var ret = ERROR;
+    connection.query(query, [
+            req.params.patient_id, 
+            req.params.start_date, 
+            req.params.finish_date, 
+            req.params.description
+        ], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            ret = SUCCESS;
+        }
+        res.send(JSON.stringify(ret));
+    });
+});
+
 const PORT = process.env.PORT || 8082;
 var server = app.listen(PORT, function() {
     console.log("medicana server started");
