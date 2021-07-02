@@ -327,6 +327,30 @@ app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointmen
     });
 });
 
+app.get('/patient_treatments/:patient_id', function(req, res, next) {
+    var query = "select * from treatment where treatment_id in (select distinct treatment_id from appointment where patient_id = ? and treatment_id is not null)";
+    connection.query(query, [req.params.patient_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
+    });
+});
+
+app.get('/doctor_treatments/:doctor_id', function(req, res, next) {
+    var query = "select * from treatment where treatment_id in (select distinct treatment_id from appointment where doctor_id = ? and treatment_id is not null)";
+    connection.query(query, [req.params.doctor_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
+    });
+});
+
 const PORT = process.env.PORT || 8082;
 var server = app.listen(PORT, function() {
     console.log("medicana server started");
