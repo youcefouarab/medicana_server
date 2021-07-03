@@ -1,9 +1,8 @@
-var express = require("express");
-var mysql = require("mysql");
-var app = express();
-var bodyParser = require('body-parser');
-
-const db_connection = require('./db_connection.json');
+const express = require("express");
+const mysql = require("mysql");
+const app = express();
+const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -11,7 +10,10 @@ app.use(bodyParser.raw());
 
 app.use(express.static("public"));
 
-var connection = mysql.createPool(db_connection);
+const db_connection = require('./db_connection.json');
+const connection = mysql.createPool(db_connection);
+
+const saltRounds = 10;
 
 const SUCCESS = "success";
 const ERROR = "error";
@@ -59,30 +61,42 @@ app.get('/doctor_patients/:doctor_id', function(req, res, next) {
 
 app.get('/auth_patient/:phone_number/:password', function(req, res, next) {
 	var data = Object();
-    var query = "select * from patient where phone_number = ?";
+    var query = "select * from patient where phone_number = ? limit 1";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
     	} else {
-        	if ((results.length > 0) && (results[0].password == req.params.password)){
-          		data = results[0];
-        	}
-    		res.send(JSON.stringify(data));
+        	if (results.length > 0) {
+                bcrypt.compare(req.params.password, results[0].password, function(err, result) {
+                    if (result == true) {
+                        data = results[0];
+                    }
+                    res.send(JSON.stringify(data));
+                });
+        	} else {
+                res.send(JSON.stringify(data));   
+            }
     	}
   	});
 });
 
 app.get('/auth_doctor/:phone_number/:password', function(req, res, next) {
 	var data = Object();
-    var query = "select * from doctor where phone_number = ?";
+    var query = "select * from doctor where phone_number = ? limit 1";
     connection.query(query, [req.params.phone_number], function(error, results) {
     	if (error) {
     		next(error);
     	} else {
-        	if ((results.length > 0) && (results[0].password == req.params.password)){
-          		data = results[0];
-        	}
-    		res.send(JSON.stringify(data));
+        	if (results.length > 0) {
+                bcrypt.compare(req.params.password, results[0].password, function(err, result) {
+                    if (result == true) {
+                        data = results[0];
+                    }
+                    res.send(JSON.stringify(data));
+                });
+            } else {
+                res.send(JSON.stringify(data));   
+            }
     	}
   	});
 });
@@ -150,7 +164,7 @@ app.get('/doctor_appointments/:doctor_id', function(req, res, next) {
 
 app.get('/doctor_appointment/:doctor_id/:appointment_id', function(req, res, next) {
     var data = Object();
-    var query = "select * from appointment natural join patient where appointment.doctor_id = ? and appointment_id = ?";
+    var query = "select * from appointment natural join patient where appointment.doctor_id = ? and appointment_id = ? limit 1";
     connection.query(query, [req.params.doctor_id, req.params.appointment_id], function(error, results) {
         if (error) {
             next(error);
@@ -352,6 +366,6 @@ app.get('/doctor_treatments/:doctor_id', function(req, res, next) {
 });
 
 const PORT = process.env.PORT || 8082;
-var server = app.listen(PORT, function() {
+const server = app.listen(PORT, function() {
     console.log("medicana server started");
 });
