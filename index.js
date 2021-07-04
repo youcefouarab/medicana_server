@@ -423,7 +423,10 @@ function send_notif_appointments(doctor_id) {
         title: 'New appointment',
         body: 'A patient has booked a new appointment with you'
       },
-      condition: condition
+      condition: condition,
+      android: {
+        ttl: "31536000s"
+      }
     };
     admin.messaging().send(message)
       .then((response) => {
@@ -442,7 +445,10 @@ function send_notif_treatments(patient_id) {
         title: 'New treatment',
         body: 'Your doctor has prescribed a new treatment for you'
       },
-      condition: condition
+      condition: condition,
+      android: {
+        ttl: "31536000s"
+      }
     };
     admin.messaging().send(message)
       .then((response) => {
@@ -462,7 +468,10 @@ function send_notif_ask_advice(doctor_id) {
         title: 'Advice request',
         body: 'Your patient is asking for advice from you'
       },
-      condition: condition
+      condition: condition,
+      android: {
+        ttl: "31536000s"
+      }
     };
     admin.messaging().send(message)
       .then((response) => {
@@ -482,7 +491,10 @@ function send_notif_give_advice(patient_id) {
         title: 'Advice',
         body: 'Your doctor has responded to your advice request'
       },
-      condition: condition
+      condition: condition,
+      android: {
+        ttl: "31536000s"
+      }
     };
     admin.messaging().send(message)
       .then((response) => {
