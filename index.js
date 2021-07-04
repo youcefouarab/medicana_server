@@ -284,7 +284,7 @@ app.post('/register/:user_type/:user_id/:token', function(req, res, next) {
 });
 
 app.delete('/unregister/:device_id', function(req, res, next) {
-    var query = "delete from device where device_id";
+    var query = "delete from device where device_id = ?";
     var ret = ERROR;
     connection.query(query, [req.params.device_id], function(error, results) {
         if (error) {
