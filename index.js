@@ -315,7 +315,7 @@ app.get('/get_tokens/:user_type/:user_id', function(req, res, next) {
     });
 });
 
-app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointment_id', function(req, res, next) {
+app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointment_id/:patient_id', function(req, res, next) {
     var query = "select treatment_id from appointment where appointment_id = ? limit 1";
     var ret = ERROR;
     connection.query(query, [req.params.appointment_id], function(error, results) {
@@ -335,6 +335,7 @@ app.post('/prescribe_treatment/:start_date/:finish_date/:description/:appointmen
                                 next(error);
                             } else {
                                 ret = treatment_id;
+                                send_notif_treatments(req.params.patient_id);
                                 res.send(JSON.stringify(ret));
                             }
                         });
@@ -383,6 +384,25 @@ function send_notif_appointments(doctor_id) {
       notification: {
         title: 'New appointment',
         body: 'A patient has booked a new appointment with you'
+      },
+      condition: condition
+    };
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
+
+}
+
+function send_notif_treatments(patient_id) {
+    const condition = '\'treatments-for-'+patient_id+'\' in topics';
+    const message = {
+      notification: {
+        title: 'New treatment',
+        body: 'Your doctor has prescribed a new treatment for you'
       },
       condition: condition
     };
