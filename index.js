@@ -425,7 +425,7 @@ function send_notif_appointments(doctor_id) {
       },
       condition: condition,
       android: {
-        ttl: "31536000s"
+        ttl: 2592000000
       }
     };
     admin.messaging().send(message)
@@ -447,7 +447,7 @@ function send_notif_treatments(patient_id) {
       },
       condition: condition,
       android: {
-        ttl: "31536000s"
+        ttl: 2592000000
       }
     };
     admin.messaging().send(message)
@@ -470,7 +470,7 @@ function send_notif_ask_advice(doctor_id) {
       },
       condition: condition,
       android: {
-        ttl: "31536000s"
+        ttl: 2592000000
       }
     };
     admin.messaging().send(message)
@@ -493,7 +493,7 @@ function send_notif_give_advice(patient_id) {
       },
       condition: condition,
       android: {
-        ttl: "31536000s"
+        ttl: 2592000000
       }
     };
     admin.messaging().send(message)
