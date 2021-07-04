@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const admin = require("firebase-admin");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -12,6 +13,11 @@ app.use(express.static("public"));
 
 const db_connection = require('./db_connection.json');
 const connection = mysql.createPool(db_connection);
+
+const serviceAccount = require("medicana-26077-firebase-adminsdk-xhzy8-625e0d3d9a.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 const saltRounds = 10;
 
@@ -114,14 +120,15 @@ app.get('/availabilities/:doctor_id/:date/:start_time', function(req, res, next)
     });
 });
 
-app.put('/book_appointment/:appointment_id/:patient_id', function(req, res, next) {
+app.put('/book_appointment/:appointment_id/:patient_id/:doctor_id', function(req, res, next) {
     var query = "update appointment set patient_id = ? where appointment_id = ?";
     var ret = ERROR;
     connection.query(query, [req.params.patient_id, req.params.appointment_id], function(error, results) {
     	if (error) {
     	    next(error);
     	} else {
-    	    ret = SUCCESS;	
+    	    ret = SUCCESS;
+            send_notif_appointments(req.params.doctor_id);
     	}
 	   res.send(JSON.stringify(ret));
     });
@@ -369,3 +376,22 @@ const PORT = process.env.PORT || 8082;
 const server = app.listen(PORT, function() {
     console.log("medicana server started");
 });
+
+function send_notif_appointments(doctor_id) {
+    const condition = '\'appointments-for-'+doctor_id+'\' in topics';
+    const message = {
+      notification: {
+        title: 'New appointment',
+        body: 'A patient has booked a new appointment with you'
+      },
+      condition: condition
+    };
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
+
+}
