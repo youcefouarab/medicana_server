@@ -202,9 +202,9 @@ app.post('/ask_advice', function(req, res, next) {
             ret = SUCCESS;
             var already_sent = [];
             req.body.forEach(e => {
-                if (!already_sent.contains(e.patient_id)) {
-                    send_notif_ask_advice(e.patient_id);
-                    already_sent.push(e.patient_id);    
+                if (!already_sent.contains(e.doctor_id)) {
+                    send_notif_ask_advice(e.doctor_id);
+                    already_sent.push(e.doctor_id);    
                 }
             });
         }
@@ -230,9 +230,9 @@ app.post('/give_advice', function(req, res, next) {
             ret = SUCCESS;
             var already_sent = [];
             req.body.forEach(e => {
-                if (!already_sent.contains(e.doctor_id)) {
-                    send_notif_give_advice(e.doctor_id);
-                    already_sent.push(e.doctor_id);    
+                if (!already_sent.contains(e.patient_id)) {
+                    send_notif_give_advice(e.patient_id);
+                    already_sent.push(e.patient_id);    
                 }
             });
         }
