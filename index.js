@@ -14,7 +14,7 @@ app.use(express.static("public"));
 const db_connection = require('./db_connection.json');
 const connection = mysql.createPool(db_connection);
 
-const serviceAccount = require("medicana-26077-firebase-adminsdk-xhzy8-625e0d3d9a.json");
+const serviceAccount = require("./medicana-26077-firebase-adminsdk-xhzy8-625e0d3d9a.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
