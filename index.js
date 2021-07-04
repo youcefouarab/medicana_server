@@ -291,6 +291,30 @@ app.get('/all_doctor_advice/:doctor_id', function(req, res, next) {
     });
 });
 
+app.get('/advice_with_patient/:patient_id/:doctor_id', function(req, res, next) {
+    var query = "select * from advice where patient_id = ? and doctor_id = ?";
+    connection.query(query, [req.params.patient_id, req.params.doctor_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
+    });
+});
+
+app.get('/advice_with_doctor/:doctor_id/:patient_id', function(req, res, next) {
+    var query = "select * from advice where doctor_id = ? and patient_id = ?";
+    connection.query(query, [req.params.doctor_id, req.params.patient_id], function(error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.send(JSON.stringify(results));
+        }
+    
+    });
+});
+
 app.post('/register/:user_type/:user_id/:token', function(req, res, next) {
     var query = "insert into device (user_type, user_id, token) values (?, ?, ?)";
     var ret = ERROR;
