@@ -200,6 +200,13 @@ app.post('/ask_advice', function(req, res, next) {
             next(error);
         } else {
             ret = SUCCESS;
+            var already_sent = [];
+            req.body.forEach(e => {
+                if (!already_sent.contains(e.patient_id)) {
+                    send_notif_ask_advice(e.patient_id);
+                    already_sent.push(e.patient_id);    
+                }
+            });
         }
         res.send(JSON.stringify(ret));
     });
@@ -221,6 +228,13 @@ app.post('/give_advice', function(req, res, next) {
             next(error);
         } else {
             ret = SUCCESS;
+            var already_sent = [];
+            req.body.forEach(e => {
+                if (!already_sent.contains(e.doctor_id)) {
+                    send_notif_give_advice(e.doctor_id);
+                    already_sent.push(e.doctor_id);    
+                }
+            });
         }
         res.send(JSON.stringify(ret));
     });
@@ -403,6 +417,46 @@ function send_notif_treatments(patient_id) {
       notification: {
         title: 'New treatment',
         body: 'Your doctor has prescribed a new treatment for you'
+      },
+      condition: condition
+    };
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
+
+}
+
+
+function send_notif_ask_advice(doctor_id) {
+    const condition = '\'ask-advice-from-'+doctor_id+'\' in topics';
+    const message = {
+      notification: {
+        title: 'Advice request',
+        body: 'Your patient is asking for advice from you'
+      },
+      condition: condition
+    };
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+      });
+
+}
+
+
+function send_notif_give_advice(patient_id) {
+    const condition = '\'give-advice-to-'+patient_id+'\' in topics';
+    const message = {
+      notification: {
+        title: 'Advice',
+        body: 'Your doctor has responded to your advice request'
       },
       condition: condition
     };
