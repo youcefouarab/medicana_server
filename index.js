@@ -54,7 +54,7 @@ app.get('/patient_doctors/:patient_id', function(req, res, next) {
 });
 
 app.get('/doctor_patients/:doctor_id', function(req, res, next) {
-    var query = "select * from patient where patient_id in (select distinct patient_id from advice where doctor_id = ?)";
+    var query = "select * from patient where patient_id in (select distinct patient_id from appointment where doctor_id = ?)";
     connection.query(query, req.params.doctor_id, function(error, results) {
         if (error) {
             next(error);
